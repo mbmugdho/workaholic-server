@@ -25,20 +25,16 @@ export async function createTask(req, res, next) {
     const payableAmount = Number(req.body.payableAmount)
 
     if (!Number.isFinite(requiredWorkers) || requiredWorkers <= 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: 'requiredWorkers must be a positive number',
-        })
+      return res.status(400).json({
+        success: false,
+        message: 'requiredWorkers must be a positive number',
+      })
     }
     if (!Number.isFinite(payableAmount) || payableAmount <= 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: 'payableAmount must be a positive number',
-        })
+      return res.status(400).json({
+        success: false,
+        message: 'payableAmount must be a positive number',
+      })
     }
 
     const completionDate = new Date(req.body.completionDate)
@@ -186,5 +182,38 @@ export async function deleteMyTask(req, res, next) {
     next(err)
   } finally {
     session.endSession()
+  }
+}
+
+export async function getAvailableTasks(req, res, next) {
+  try {
+    const now = new Date()
+
+    const tasks = await Task.find({
+      requiredWorkers: { $gt: 0 },
+      completionDate: { $gte: now },
+    })
+      .sort({ createdAt: -1 })
+      .select(
+        'taskTitle buyerName buyerEmail completionDate payableAmount requiredWorkers taskImageUrl'
+      )
+
+    res.json({ success: true, tasks })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getTaskById(req, res, next) {
+  try {
+    const { id } = req.params
+
+    const task = await Task.findById(id)
+    if (!task)
+      return res.status(404).json({ success: false, message: 'Task not found' })
+
+    res.json({ success: true, task })
+  } catch (err) {
+    next(err)
   }
 }

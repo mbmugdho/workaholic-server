@@ -2,7 +2,6 @@ import User from '../models/User.js'
 import Task from '../models/Task.js'
 import Submission from '../models/Submission.js'
 import Payment from "../models/Payment.js";
-import Task from "../models/Task.js";
 
 export async function getTopWorkers(req, res, next) {
   try {
@@ -68,5 +67,30 @@ export async function getBuyerSummary(req, res, next) {
     })
   } catch (err) {
     next(err)
+  }
+}
+
+export async function getWorkerSummary(req, res, next) {
+  try {
+    const workerEmail = req.user?.email;
+    if (!workerEmail) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    const [totalSubmissions, pendingSubmissions, earningAgg] = await Promise.all([
+      Submission.countDocuments({ workerEmail }),
+      Submission.countDocuments({ workerEmail, status: "pending" }),
+      Submission.aggregate([
+        { $match: { workerEmail, status: "approved" } },
+        { $group: { _id: null, totalEarning: { $sum: "$payableAmount" } } },
+      ]),
+    ]);
+
+    const totalEarning = earningAgg?.[0]?.totalEarning ?? 0;
+
+    res.json({
+      success: true,
+      summary: { totalSubmissions, pendingSubmissions, totalEarning },
+    });
+  } catch (err) {
+    next(err);
   }
 }

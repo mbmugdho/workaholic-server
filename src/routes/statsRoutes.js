@@ -1,15 +1,24 @@
-import { Router } from "express";
-import { getPublicStats, getTopWorkers, getBuyerSummary } from "../controllers/statsController.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
-import verifyBuyer from "../middlewares/verifyBuyer.js";
+import { Router } from 'express'
+import {
+  getPublicStats,
+  getTopWorkers,
+  getBuyerSummary,
+  getWorkerSummary,
+} from '../controllers/statsController.js'
+import { authMiddleware } from '../middlewares/authMiddleware.js'
+import verifyBuyer from '../middlewares/verifyBuyer.js'
+import verifyWorker from '../middlewares/verifyWorker.js'
 
-const router = Router();
+const router = Router()
 
-// Public endpoints for homepage
-router.get("/top-workers", getTopWorkers);
-router.get("/public", getPublicStats);
+// Public
+router.get('/top-workers', getTopWorkers)
+router.get('/public', getPublicStats)
 
-// Buyer dashboard summary
-router.get("/buyer/summary", authMiddleware, verifyBuyer, getBuyerSummary);
+// Buyer
+router.get('/buyer/summary', authMiddleware, verifyBuyer, getBuyerSummary)
 
-export default router;
+// Worker
+router.get('/worker/summary', authMiddleware, verifyWorker, getWorkerSummary)
+
+export default router
