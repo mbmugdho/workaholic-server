@@ -34,6 +34,7 @@ const submissionSchema = new mongoose.Schema(
 submissionSchema.index({ workerEmail: 1, createdAt: -1 })
 submissionSchema.index({ buyerEmail: 1, status: 1 })
 submissionSchema.index({ taskId: 1, createdAt: -1 })
+submissionSchema.index({ buyerEmail: 1, status: 1, createdAt: -1 });
 
 const Submission = mongoose.model('Submission', submissionSchema)
 export default Submission
