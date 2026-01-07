@@ -5,6 +5,10 @@ import morgan from 'morgan'
 import dotenv from 'dotenv'
 import { connectDB } from './config/db.js'
 import { errorHandler } from './middlewares/errorHandler.js'
+import routes from './routes/index.js'
+
+
+
 
 dotenv.config()
 
@@ -20,6 +24,7 @@ app.use(
 )
 app.use(express.json())
 app.use(morgan('dev'))
+app.use('/api', routes)
 
 // health route
 app.get('/', (req, res) => {
