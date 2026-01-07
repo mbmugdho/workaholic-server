@@ -208,7 +208,10 @@ export async function getTaskById(req, res, next) {
   try {
     const { id } = req.params
 
-    const task = await Task.findById(id)
+    const task = await Task.findById(id).select(
+      'buyerName buyerEmail taskTitle taskDetail requiredWorkers payableAmount completionDate submissionInfo taskImageUrl createdAt'
+    )
+
     if (!task)
       return res.status(404).json({ success: false, message: 'Task not found' })
 
