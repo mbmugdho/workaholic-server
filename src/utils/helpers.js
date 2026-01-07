@@ -1,6 +1,8 @@
+export const COINS_PER_USD_WITHDRAW = 20
+export const MIN_WITHDRAW_COINS = 200
+
 export function coinsToUSD(coins) {
-  // Worker withdrawal rule: 20 coins = 1 USD
-  return Number((coins / 20).toFixed(2))
+  return Number((coins / COINS_PER_USD_WITHDRAW).toFixed(2))
 }
 
 export function usdToBuyerCoins(usd) {
