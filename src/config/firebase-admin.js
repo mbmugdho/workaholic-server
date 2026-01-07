@@ -1,29 +1,37 @@
 import admin from 'firebase-admin'
 
-let initialized = false
-
 export function getFirebaseAdmin() {
-  if (initialized) return admin
+  // Already initialized?
+  if (admin.apps?.length) return admin
 
-  // Option A: one JSON env var
+  // Option A: One JSON env var
   const json = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
   if (json) {
     const serviceAccount = JSON.parse(json)
+
+    // Fix private_key newlines if needed
+    if (serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(
+        /\\n/g,
+        '\n'
+      )
+    }
+
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     })
-    initialized = true
+
     return admin
   }
 
-  // Option B: individual env vars
+  // Option B: Separate env vars
   const projectId = process.env.FIREBASE_PROJECT_ID
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
   let privateKey = process.env.FIREBASE_PRIVATE_KEY
 
   if (projectId && clientEmail && privateKey) {
-    // Render/CI often stores \n escaped newlines
     privateKey = privateKey.replace(/\\n/g, '\n')
+
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId,
@@ -31,12 +39,10 @@ export function getFirebaseAdmin() {
         privateKey,
       }),
     })
-    initialized = true
+
     return admin
   }
 
-  // Not configured yet (ok for Phase 1)
-  console.warn(' Firebase Admin not configured. Skipping initialization.')
-  initialized = true
-  return admin
+  // Not configured
+  return null
 }
