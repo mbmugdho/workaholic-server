@@ -6,6 +6,7 @@ import taskRoutes from './taskRoutes.js'
 import paymentRoutes from './paymentRoutes.js'
 import submissionRoutes from './submissionRoutes.js'
 import withdrawalRoutes from './withdrawalRoutes.js'
+import adminRoutes from "./adminRoutes.js";
 
 const router = Router()
 
@@ -23,5 +24,6 @@ router.use('/tasks', taskRoutes)
 router.use('/payments', paymentRoutes)
 router.use('/submissions', submissionRoutes)
 router.use('/withdrawals', withdrawalRoutes)
+router.use("/admin", adminRoutes);
 
 export default router
